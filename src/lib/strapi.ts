@@ -1,8 +1,21 @@
-export const API_URL = 'https://2amcreations.com';
-export const SITE_SLUG = 'xmyxyswkj';
+const DEFAULT_API_URL = 'https://2amcreations.com';
+const DEFAULT_SITE_SLUG = 'xmyxyswkj';
+
+function getBaseUrl(): string {
+  const cfg = (typeof window !== 'undefined' && (window as any).APP_CONFIG) || {};
+  return cfg.apiEndpoints?.cmsBaseUrl || DEFAULT_API_URL;
+}
+
+function getSiteSlug(): string {
+  const cfg = (typeof window !== 'undefined' && (window as any).APP_CONFIG) || {};
+  return cfg.apiEndpoints?.cmsSiteId || DEFAULT_SITE_SLUG;
+}
 
 export function buildUrl(path: string): string {
-  return `${API_URL}${path}`;
+  const base = getBaseUrl();
+  if (base.endsWith('/') && path.startsWith('/')) return `${base.slice(0, -1)}${path}`;
+  if (!base.endsWith('/') && !path.startsWith('/')) return `${base}/${path}`;
+  return `${base}${path}`;
 }
 
 function normalizeImage(media: any): string | null {
@@ -26,7 +39,8 @@ export type BlogPostListItem = {
 };
 
 export async function fetchBlogPosts(): Promise<BlogPostListItem[]> {
-  const query = `/api/blog-posts?populate=coverImage&filters[site][slug][$eq]=${SITE_SLUG}&sort=createdAt:desc`;
+  const site = getSiteSlug();
+  const query = `/api/blog-posts?populate=coverImage&filters[site][slug][$eq]=${site}&sort=createdAt:desc`;
   const res = await fetch(buildUrl(query));
   if (!res.ok) throw new Error('Failed to fetch blog posts');
   const json = await res.json();
@@ -51,7 +65,8 @@ export type BlogPostDetail = {
 };
 
 export async function fetchBlogBySlug(slug: string): Promise<BlogPostDetail | null> {
-  const query = `/api/blog-posts?populate=*&filters[slug][$eq]=${slug}&filters[site][slug][$eq]=${SITE_SLUG}`;
+  const site = getSiteSlug();
+  const query = `/api/blog-posts?populate=*&filters[slug][$eq]=${slug}&filters[site][slug][$eq]=${site}`;
   const res = await fetch(buildUrl(query));
   if (!res.ok) throw new Error('Failed to fetch blog detail');
   const json = await res.json();

@@ -1,0 +1,26 @@
+{
+  "siteIdentity": {
+    "name": "默认站点名称",
+    "logoUrl": "/default-logo.png"
+  },
+  "theming": {
+    "primaryColor": "#333333"
+  },
+  "apiEndpoints": {
+    "cmsBaseUrl": "https://2amcreations.com",
+    "cmsSiteId": "xmyxyswkj"
+  },
+  "app_name": "默认站点名称",
+  "slogan": "默认 Slogan",
+  "description": "默认站点描述",
+  "hero_title": "默认 Hero 标题",
+  "hero_description": "默认 Hero 描述",
+  "hero_image_url": "",
+  "hero_cta_text": "立即体验",
+  "seo": {
+    "title": "默认 SEO 标题",
+    "description": "默认 SEO 描述"
+  },
+  "seo_keyword": "默认关键词",
+  "gtm_id": "GTM-58TDPTJ3"
+}

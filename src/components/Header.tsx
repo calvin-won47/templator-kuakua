@@ -1,13 +1,21 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useConfig } from '../contexts/ConfigContext';
 
 const Header: React.FC = () => {
+  const cfg = useConfig();
+  const siteName = cfg?.siteIdentity?.name || cfg?.app_name || 'kuakua';
+  const logoUrl = cfg?.siteIdentity?.logoUrl || '';
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-slate-50/50 backdrop-blur-lg">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-        <Link to="/" className="text-2xl font-extrabold tracking-tight text-gray-900">
-          kuakua
+        <Link to="/" className="flex items-center gap-2 text-2xl font-extrabold tracking-tight text-gray-900">
+          {logoUrl ? (
+            <img src={logoUrl} alt={siteName} className="h-8 w-8 rounded" />
+          ) : null}
+          <span>{siteName}</span>
         </Link>
         <div className="flex items-center gap-3">
           <Link

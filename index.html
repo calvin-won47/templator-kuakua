@@ -5,16 +5,59 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>正在加载...</title>
+    <script>
+      // Bootstrap external config before React renders
+      // Provide a safe default in case fetching fails
+      window.APP_CONFIG = {
+        siteIdentity: { name: "加载失败" },
+        apiEndpoints: { cmsBaseUrl: "", cmsSiteId: "error" }
+      };
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/config.json', false); // synchronous to block rendering
+        xhr.send(null);
+        if (xhr.status === 200) {
+          window.APP_CONFIG = JSON.parse(xhr.responseText);
+        } else {
+          console.warn('无法加载外部 config.json，将使用默认配置。');
+        }
+      } catch (error) {
+        console.error('加载 config.json 时出错:', error);
+      }
+      // Apply SEO meta and favicon from config
+      try {
+        var cfg = window.APP_CONFIG || {};
+        var title = (cfg.seo && cfg.seo.title) || (cfg.siteIdentity && cfg.siteIdentity.name) || '夸夸一下，立马开心';
+        document.title = title;
+        var descMeta = document.querySelector('meta[name="description"]');
+        if (descMeta) descMeta.setAttribute('content', (cfg.seo && cfg.seo.description) || cfg.description || '');
+        var kwMeta = document.querySelector('meta[name="keywords"]');
+        if (kwMeta) kwMeta.setAttribute('content', cfg.seo_keyword || '');
+        var iconLink = document.querySelector('link[rel="icon"]');
+        if (iconLink && cfg.siteIdentity && cfg.siteIdentity.logoUrl) {
+          iconLink.setAttribute('href', cfg.siteIdentity.logoUrl);
+        }
+      } catch (e) {
+        console.warn('应用 SEO 元信息失败:', e);
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <title>夸夸一下，立马开心</title>
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-58TDPTJ3');</script>
+    <script>
+      (function(){
+        var gtmId = (window.APP_CONFIG && window.APP_CONFIG.gtm_id) || 'GTM-58TDPTJ3';
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer', gtmId);
+      })();
+    </script>
     <!-- End Google Tag Manager -->
   </head>
   <body>
