@@ -57,8 +57,12 @@ jobs:
       matrix:
         site_path:
           # 运行 'create_site.py' 后，您需要来这里添加新站点的路径
-          - /www/wwwroot/xmyxyswkj.com
-          - /www/wwwroot/ganyurencai.com
+          - /www/wwwroot/rizexo.com
+          - /www/wwwroot/fyxta.com
+          - /www/wwwroot/pixuvo.com
+          - /www/wwwroot/vit88.cc
+          - /www/wwwroot/beachresidencezandvoort.com
+
           # - /www/wwwroot/client-c.com
           #... 您可以在这里列出100个
 

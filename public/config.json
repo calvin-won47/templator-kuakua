@@ -1,109 +1,107 @@
 {
   "siteIdentity": {
-    "name": "默认站点名称123",
+    "name": "RizeVortex",
     "logoUrl": "/default-logo.png"
   },
   "theming": {
-    "primaryColor": "#333333"
+    "primaryColor": "#7C3AED"
   },
   "apiEndpoints": {
     "cmsBaseUrl": "https://2amcreations.com",
     "cmsSiteId": "xmyxyswkj"
   },
-  "app_name": "默认站点名称",
-  "slogan": "默认 Slogan",
-  "description": "默认站点描述",
-  "hero_title": "默认 Hero 标题",
-  "hero_description": "默认 Hero 描述",
-  "hero_image_url": "",
-  "hero_cta_text": "立即体验",
+  "app_name": "RizeVortex",
+  "slogan": "电竞潮品商城 RizeVortex",
+  "description": "高端外设、定制队服、限定收藏，爱好者首选",
+  "hero_title": "电竞潮品，一站购齐",
+  "hero_description": "高端键鼠外设、战队队服与限定收藏，装备上场",
+  "hero_image_url": "https://placehold.co/550x550/png?text=RizeVortex",
+  "hero_cta_text": "立即逛店",
   "seo": {
-    "title": "默认 SEO 标题",
-    "description": "默认 SEO 描述"
+    "title": "RizeVortex 电竞潮品商城 | 高端外设·定制队服·限定收藏",
+    "description": "面向 15–35 岁电竞玩家的潮流与性能之选，提供旗舰级外设、热门战队定制队服与限定收藏周边，快递极速送达。"
   },
-  "seo_keyword": "默认关键词",
-  "gtm_id": "GTM-58TDPTJ3",
+  "seo_keyword": "电竞,游戏外设,键盘,鼠标,定制队服,电竞周边,Gaming Merch,RizeVortex",
+  "gtm_id": "GTM-NXXBV4K3",
   "extra": {
     "features": {
-      "title": "我们的特色",
-      "subtitle": "我们用心为你打造最好的夸夸体验",
+      "title": "店铺特色",
+      "subtitle": "为电竞玩家打造的潮流与性能之选",
       "items": [
         {
-          "title": "多种夸夸风格",
-          "description": "内置多种夸夸风格，如“鼓励师”、“抬杠”、“毒舌”等，满足你的不同需求。",
+          "title": "高端电竞外设",
+          "description": "旗舰级键盘、鼠标、耳机，性能手感双优。",
           "imageUrl": "https://placehold.co/300x200/png",
-          "alt": "Feature 1"
+          "alt": "Esports Gear"
         },
         {
-          "title": "智能识别场景",
-          "description": "AI 会智能识别你的烦恼场景，并给出更贴切的夸奖。",
+          "title": "定制战队队服",
+          "description": "支持热门战队与个人 ID 定制，面料舒适耐穿。",
           "imageUrl": "https://placehold.co/300x200/png",
-          "alt": "Feature 2"
+          "alt": "Team Jerseys"
         },
         {
-          "title": "保护你的隐私",
-          "description": "我们不会存储你的任何对话内容，你的隐私将得到充分保护。",
+          "title": "限定收藏周边",
+          "description": "潮流手办、纪念徽章、联名周边，数量有限。",
           "imageUrl": "https://placehold.co/300x200/png",
-          "alt": "Feature 3"
+          "alt": "Exclusive Collectibles"
         }
       ]
     },
     "howItWorks": {
-      "title": "如何使用",
-      "subtitle": "简单三步，让你立马开心",
+      "title": "如何购买",
+      "subtitle": "下单三步，装备即刻到手",
       "steps": [
         {
           "icon": "MessageSquare",
-          "title": "写下你的烦恼",
-          "description": "无论任何烦恼，都可以向 AI 诉说，我们会认真倾听。"
+          "title": "挑选心仪商品",
+          "description": "浏览分类与精选合集，加入购物车。"
         },
         {
           "icon": "BrainCircuit",
-          "title": "AI 分析并夸夸你",
-          "description": "AI 会分析你的烦恼，并从多个角度、多个方面来夸奖你。"
+          "title": "确认订单信息",
+          "description": "填写收货地址，选择支付与优惠券。"
         },
         {
           "icon": "Share2",
-          "title": "分享或再次夸夸",
-          "description": "你可以将夸夸内容分享给朋友，或者再次向 AI 夸夸。"
+          "title": "下单与分享",
+          "description": "完成支付，等待发货，分享战绩。"
         }
       ]
     },
     "pricing": {
-      "title": "选择适合你的方案",
-      "subtitle": "我们提供免费版和专业版，满足你的不同需求",
+      "title": "会员方案",
+      "subtitle": "成为会员，享受独家福利",
       "plans": [
         {
-          "name": "免费版",
-          "description": "适合偶尔使用的用户",
+          "name": "免费会员",
+          "description": "基础折扣与活动参与",
           "price": "¥0",
           "period": "/永久",
-          "features": ["每天 3 次免费使用", "标准夸夸模型"],
-          "ctaText": "立即开始",
+          "features": ["全站浏览", "参与基础活动"],
+          "ctaText": "免费加入",
           "highlighted": false
         },
         {
-          "name": "专业版",
+          "name": "Pro 会员",
           "badge": "推荐",
-          "description": "适合需要更多功能的用户",
-          "price": "¥19.9",
+          "description": "更大折扣与优先购",
+          "price": "¥19",
           "period": "/月",
-          "features": ["无限次使用", "所有夸夸模型", "更快的响应速度", "优先体验新功能"],
+          "features": ["更大会员折扣", "限定周边优先购", "专属上新提醒", "客服优先支持"],
           "ctaText": "升级 Pro",
           "highlighted": true
         }
       ]
     },
     "testimonials": {
-      "title": "听听大家怎么说",
-      "subtitle": "我们已经收到了很多用户的好评",
+      "title": "玩家评价",
+      "subtitle": "来自玩家与收藏者的真实体验",
       "items": [
-        { "name": "匿名用户", "text": "夸夸太好用了，每次不开心的时候，都会来这里夸一夸，心情立马就好了。", "avatarUrl": "https://i.pravatar.cc/48?u=1" },
-        { "name": "匿名用户", "text": "夸夸的 AI 很智能，能够理解我的烦恼，并给出很贴切的夸奖。", "avatarUrl": "https://i.pravatar.cc/48?u=2" },
-        { "name": "匿名用户", "text": "我最喜欢毒舌模式，每次都能把我逗笑，哈哈哈哈。", "avatarUrl": "https://i.pravatar.cc/48?u=3" },
-        { "name": "匿名用户", "text": "夸夸的界面很简洁，用起来很舒服，没有乱七八糟的东西。", "avatarUrl": "https://i.pravatar.cc/48?u=4" },
-        { "name": "匿名用户", "text": "夸夸的隐私保护做得很好，让我很放心。", "avatarUrl": "https://i.pravatar.cc/48?u=5" },
-        { "name": "匿名用户", "text": "夸夸的免费版就很好用，Pro 版的功能更强大，我已经升级了。", "avatarUrl": "https://i.pravatar.cc/48?u=6" }
+        { "name": "电竞玩家A", "text": "键盘手感太棒了，游戏反应更快，强烈推荐！", "avatarUrl": "https://i.pravatar.cc/48?u=11" },
+        { "name": "收藏者B", "text": "限定周边做工精致，包装也很用心，值得收藏。", "avatarUrl": "https://i.pravatar.cc/48?u=12" },
+        { "name": "战队粉丝C", "text": "定制队服帆布质感很好，印字清晰，穿着舒适。", "avatarUrl": "https://i.pravatar.cc/48?u=13" },
+        { "name": "玩家D", "text": "发货很快，客服响应及时，购物体验满分。", "avatarUrl": "https://i.pravatar.cc/48?u=14" }
       ]
     }
   }
