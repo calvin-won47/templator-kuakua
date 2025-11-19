@@ -7,12 +7,20 @@ on:
   push:
     branches:
       - main
+  schedule:
+    # 定时刷新 sitemap 与 robots（UTC 时间）。根据你的更新频率可调整。
+    - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
       target_site_path:
         description: "可选：只部署到某一个站点的绝对路径 (例如 /www/wwwroot/example.com)"
         required: false
         type: string
+
+concurrency:
+  # 避免定时任务与推送部署相互重叠造成竞态
+  group: deploy-master-template
+  cancel-in-progress: true
 
 jobs:
   # --- 作业 1: 构建 React/Vite 应用 ---
@@ -55,13 +63,13 @@ jobs:
     # 在这里手动维护您所有站点的“服务器绝对路径”
     strategy:
       matrix:
-        site_path:
-          # 运行 'create_site.py' 后，您需要来这里添加新站点的路径
-          - /www/wwwroot/rizexo.com
-          - /www/wwwroot/fyxta.com
-          - /www/wwwroot/pixuvo.com
-          - /www/wwwroot/vit88.cc
-          - /www/wwwroot/beachresidencezandvoort.com
+        site:
+          # 为每个站点维护 path 与 url
+          - { path: /www/wwwroot/rizexo.com, url: https://rizexo.com }
+          - { path: /www/wwwroot/fyxta.com, url: https://fyxta.com }
+          - { path: /www/wwwroot/pixuvo.com, url: https://pixuvo.com }
+          - { path: /www/wwwroot/vit88.cc, url: https://vit88.cc }
+          - { path: /www/wwwroot/beachresidencezandvoort.com, url: https://beachresidencezandvoort.com }
 
           # - /www/wwwroot/client-c.com
           #... 您可以在这里列出100个
@@ -77,6 +85,11 @@ jobs:
           name: vite-build-dist
           path: ./dist
 
+      - name: Setup Node.js 18 (for sitemap generation)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
       - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -87,7 +100,38 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.BAOTA_SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to ${{ matrix.site_path }} via rsync
+      - name: Export site URL and CMS env (read remote config with fallback)
+        run: |
+          # 站点 URL（用于生成绝对链接与 robots）
+          echo "SITE_URL=${{ matrix.site.url }}" >> $GITHUB_ENV
+
+          # 先尝试读取远程站点的 config.json（每个站点可能不同）
+          ssh ${{ secrets.BAOTA_SSH_USER }}@${{ secrets.BAOTA_SERVER_IP }} "cat ${{ matrix.site.path }}/config.json" > /tmp/site_config.json || true
+
+          # 通过 Node 解析远程与本地配置，导出 CMS_BASE_URL/CMS_SITE_ID
+          node -e '
+            const fs=require("fs");
+            const path=require("path");
+            let remote = {};
+            try { remote = JSON.parse(fs.readFileSync("/tmp/site_config.json","utf8")); } catch(e) {}
+            let local = {};
+            try { local = JSON.parse(fs.readFileSync(path.join(process.cwd(),"public","config.json"),"utf8")); } catch(e) {}
+            const cmsBase = (remote.apiEndpoints&&remote.apiEndpoints.cmsBaseUrl) || (local.apiEndpoints&&local.apiEndpoints.cmsBaseUrl) || "";
+            const cmsId = (remote.apiEndpoints&&remote.apiEndpoints.cmsSiteId) || (local.apiEndpoints&&local.apiEndpoints.cmsSiteId) || "";
+            process.stdout.write(`CMS_BASE_URL=${cmsBase}\nCMS_SITE_ID=${cmsId}\n`);
+          ' > /tmp/cms_env.txt
+          cat /tmp/cms_env.txt >> $GITHUB_ENV
+
+      - name: Generate sitemap.xml and robots.txt
+        env:
+          SITE_URL: ${{ env.SITE_URL }}
+          CMS_BASE_URL: ${{ env.CMS_BASE_URL }}
+          CMS_SITE_ID: ${{ env.CMS_SITE_ID }}
+          STRAPI_API_TOKEN: ${{ secrets.STRAPI_API_TOKEN }}
+        run: |
+          node ./scripts/generate-sitemap.mjs
+
+      - name: Deploy to ${{ matrix.site.path }} via rsync
         run: |
           rsync -rlDz \
             --delete \
@@ -97,11 +141,20 @@ jobs:
             --exclude='.well-known/' \
             --exclude='logs/' \
             --exclude='ssl/' \
-            ./dist/ ${{ secrets.BAOTA_SSH_USER }}@${{ secrets.BAOTA_SERVER_IP }}:${{ matrix.site_path }}
+            ./dist/ ${{ secrets.BAOTA_SSH_USER }}@${{ secrets.BAOTA_SERVER_IP }}:${{ matrix.site.path }}
 
       - name: Seed config.json if missing (first-time only)
         run: |
-          rsync -avzr --ignore-existing ./public/config.json ${{ secrets.BAOTA_SSH_USER }}@${{ secrets.BAOTA_SERVER_IP }}:${{ matrix.site_path }}/
+          rsync -avzr --ignore-existing ./public/config.json ${{ secrets.BAOTA_SSH_USER }}@${{ secrets.BAOTA_SERVER_IP }}:${{ matrix.site.path }}/
+
+      - name: Ping search engines (optional)
+        continue-on-error: true
+        run: |
+          if [ -n "$SITE_URL" ]; then
+            echo "Pinging Google/Bing for $SITE_URL";
+            curl -fsS "https://www.google.com/ping?sitemap=$SITE_URL/sitemap.xml" || true
+            curl -fsS "https://www.bing.com/ping?sitemap=$SITE_URL/sitemap.xml" || true
+          fi
 
   # --- 作业 3: 仅部署到一个指定站点（手动触发用） ---
   deploy_single:
@@ -119,6 +172,11 @@ jobs:
           name: vite-build-dist
           path: ./dist
 
+      - name: Setup Node.js 18 (for sitemap generation)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
       - name: Setup SSH agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
@@ -128,6 +186,36 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.BAOTA_SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Export site URL and CMS env (single site)
+        run: |
+          # 从路径推导域名：/www/wwwroot/<domain>
+          SITE_DOMAIN=$(basename "${{ inputs.target_site_path }}")
+          echo "SITE_URL=https://${SITE_DOMAIN}" >> $GITHUB_ENV
+
+          # 读取远程 config.json，失败则回退到仓库的 public/config.json
+          ssh ${{ secrets.BAOTA_SSH_USER }}@${{ secrets.BAOTA_SERVER_IP }} "cat ${{ inputs.target_site_path }}/config.json" > /tmp/site_config.json || true
+          node -e '
+            const fs=require("fs");
+            const path=require("path");
+            let remote = {};
+            try { remote = JSON.parse(fs.readFileSync("/tmp/site_config.json","utf8")); } catch(e) {}
+            let local = {};
+            try { local = JSON.parse(fs.readFileSync(path.join(process.cwd(),"public","config.json"),"utf8")); } catch(e) {}
+            const cmsBase = (remote.apiEndpoints&&remote.apiEndpoints.cmsBaseUrl) || (local.apiEndpoints&&local.apiEndpoints.cmsBaseUrl) || "";
+            const cmsId = (remote.apiEndpoints&&remote.apiEndpoints.cmsSiteId) || (local.apiEndpoints&&local.apiEndpoints.cmsSiteId) || "";
+            process.stdout.write(`CMS_BASE_URL=${cmsBase}\nCMS_SITE_ID=${cmsId}\n`);
+          ' > /tmp/cms_env.txt
+          cat /tmp/cms_env.txt >> $GITHUB_ENV
+
+      - name: Generate sitemap.xml and robots.txt (single)
+        env:
+          SITE_URL: ${{ env.SITE_URL }}
+          CMS_BASE_URL: ${{ env.CMS_BASE_URL }}
+          CMS_SITE_ID: ${{ env.CMS_SITE_ID }}
+          STRAPI_API_TOKEN: ${{ secrets.STRAPI_API_TOKEN }}
+        run: |
+          node ./scripts/generate-sitemap.mjs
 
       - name: Deploy to ${{ inputs.target_site_path }} via rsync
         run: |
@@ -144,3 +232,12 @@ jobs:
       - name: Seed config.json if missing (first-time only)
         run: |
           rsync -avzr --ignore-existing ./public/config.json ${{ secrets.BAOTA_SSH_USER }}@${{ secrets.BAOTA_SERVER_IP }}:${{ inputs.target_site_path }}/
+
+      - name: Ping search engines (optional)
+        continue-on-error: true
+        run: |
+          if [ -n "$SITE_URL" ]; then
+            echo "Pinging Google/Bing for $SITE_URL";
+            curl -fsS "https://www.google.com/ping?sitemap=$SITE_URL/sitemap.xml" || true
+            curl -fsS "https://www.bing.com/ping?sitemap=$SITE_URL/sitemap.xml" || true
+          fi
